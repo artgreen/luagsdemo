@@ -25,13 +25,13 @@ int main(int argc, char *argv[]) {
     luaL_requiref(L, "collection", luaopen_collection, 1);
     lua_pop(L, 1);
 
-//    // Load and execute the LUA script
-//    printf("Executing bridge.lua\n");
-//    if (luaL_loadfile(L, "bridge.lua") || lua_pcall(L, 0, 0, 0)) {
-//        fprintf(stderr, "Error running script: %s\n", lua_tostring(L, -1));
-//        lua_close(L);
-//        return 1;
-//    }
+    // Load and execute the LUA script
+    printf("Executing col_test.lua\n");
+    if (luaL_loadfile(L, "col_test.lua") || lua_pcall(L, 0, 0, 0)) {
+        fprintf(stderr, "Error running script: %s\n", lua_tostring(L, -1));
+        lua_close(L);
+        return 1;
+    }
 
     // Close the LUA state
     printf("Closing LUA state... Byeeeeeeeeeee!\n");
