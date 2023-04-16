@@ -13,7 +13,7 @@ CFLAGS := -I -P -D
 all: luademo
 
 luademo: $(OBJS)
-	iix link $(OBJS) $(LIB_DIR)/lua.lib KEEP=$@
+	iix link $(OBJS) $(LIB_DIR)/lvm $(LIB_DIR)/lua.lib KEEP=$@ || rm -f -- $@  # we need to delete the exe on error
 
 fixlib:
 	iix chtyp -t lib $(LIB_DIR)/lua.lib
