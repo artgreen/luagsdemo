@@ -16,7 +16,8 @@ luademo: $(OBJS)
 	iix link $(OBJS) $(LIB_DIR)/lua.lib KEEP=$@
 
 fixlib:
-	iix chtype -t lib $(LIB_DIR)/lua.lib
+	iix chtyp -t lib $(LIB_DIR)/lua.lib
+	iix chtyp -t obj $(LIB_DIR)/lvm.a
 clean:
 	@rm -f -- *.sym *.a *.b *.d *.e *.root
 
