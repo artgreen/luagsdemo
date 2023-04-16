@@ -3,7 +3,8 @@
 #
 EXE_DIR := ../build
 LIB_DIR := lib
-names := main
+
+names := main collection lua_collection
 SRCS := $(names:%=*.c)
 OBJS := $(foreach wrd, $(names),$(wrd).a)
 ADDS := $(foreach wrd, $(names),+$(wrd).a)
@@ -22,7 +23,9 @@ clean:
 	@rm -f -- *.sym *.a *.b *.d *.e *.root
 
 # Dependencies
-main.a		: main.c
+main.a				: main.c
+collection.a		: collection.c collection.h
+lua_collection.a	: lua_collection.c
 
 %.a:
 	iix compile $(CFLAGS) $<
