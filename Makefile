@@ -4,7 +4,7 @@
 EXE_DIR := ../build
 LIB_DIR := lib
 
-names := main collection lua_collection
+names := main collection lua_collection lua_status status
 SRCS := $(names:%=*.c)
 OBJS := $(foreach wrd, $(names),$(wrd).a)
 ADDS := $(foreach wrd, $(names),+$(wrd).a)
@@ -27,6 +27,8 @@ clean:
 main.a				: main.c
 collection.a		: collection.c collection.h
 lua_collection.a	: lua_collection.c
+status.a			: status.c
+lua_status.a		: lua_status.c
 
 %.a:
 	iix compile $(CFLAGS) $<
