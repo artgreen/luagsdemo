@@ -16,8 +16,8 @@ Status *status;
 
 int main(int argc, char *argv[]) {
     char *files[2] = {
-            "col_test.lua",
-            "stat_test.lua"
+            "coltest.lua",
+            "stattest.lua"
     };
 
     // Initialize the LUA state
