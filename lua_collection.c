@@ -83,3 +83,8 @@ int luaopen_collection(lua_State *L) {
     return 1;
 }
 
+void load_collection(lua_State *L) {
+    printf("Loading Collection library\n");
+    luaL_requiref(L, "collection", luaopen_collection, 1);
+    lua_pop(L, 1);
+}

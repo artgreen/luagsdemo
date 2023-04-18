@@ -3,6 +3,7 @@
 #define LUAGSDEMO_COLLECTION_H
 
 #include <stdio.h>
+#include "lstate.h"
 
 // Define a struct to represent the collection of data
 typedef struct {
@@ -24,5 +25,8 @@ void setCollectionValue(Collection *collection, size_t index, int value);
 
 // Function to get a value from a collection
 int getCollectionValue(Collection *collection, size_t index);
+
+// Load the Lua Library
+void load_collection(lua_State *L);
 
 #endif //LUAGSDEMO_COLLECTION_H

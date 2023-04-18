@@ -8,16 +8,19 @@
 segment "status";
 
 #include <stdlib.h>
+#include <string.h>
 #include "status.h"
 
 Status *newStatus(long ticks, char *name) {
     Status *status = (Status *)malloc(sizeof(Status));
+    printf("newStatus: Created Status object at address %p\n", status);
     status->ticks = ticks;
-    status->name = name;
+    strcpy(status->name, name);
     return status;
 }
 
 void freeStatus(Status *status) {
+    printf("freeStatus: Freed Status object at address %p\n", status);
     free(status);
 }
 
