@@ -3,7 +3,7 @@ Program to demo embedding the IIgs flavor of LUA
 
 Built with ORCA/C.
 
-    $ iix luademo foo.lua
+    $ iix luademo
     Initialize the LUA state
     Opening libs
     Loading Lua interface libraries
