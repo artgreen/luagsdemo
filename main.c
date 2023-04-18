@@ -52,5 +52,6 @@ int main(int argc, char *argv[]) {
     // this will also call cleanup functions
     lua_close(L);
     printf("Shutting down... byeeeeeeeeeeeeeeee!\n");
+    char dummy[10]; gets(dummy);
     return 0;
 }
