@@ -32,8 +32,8 @@ int main(int argc, char *argv[]) {
     // Load the LUA Status library
     load_status(L);
 
-    // Export the variable "export" to the LUA engine
-    printf("Exporting the status variable\n");
+    // Allocate the variable "status" to the Lua engine
+    printf("Allocating the status variable\n");
     status = newStatus(99, "Initial status");
 
     // Load and execute the Lua scripts
