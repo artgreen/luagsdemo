@@ -1,7 +1,3 @@
-md = require "memdump"
-md:initlize()
-md:dump( "dump.log" )
-
 -- Get the ticks of the status object
 ticks = status.getTicks()
 print("Initial ticks:", ticks)
