@@ -1,7 +1,7 @@
 # luagsdemo
 Program to demo embedding the IIgs flavor of LUA
 
-Built with ORCA/C.
+Built using the lua.lib produced by https://github.com/artgreen/lua-iigs
 
     $ iix luademo
     Initialize the LUA state
