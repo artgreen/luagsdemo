@@ -10,7 +10,6 @@
 
 #include "lua.h"
 #include "lauxlib.h"
-#include "lualib.h"
 #include "status.h"
 
 extern Status *status;
@@ -18,40 +17,38 @@ extern Status *status;
 // Lua function to create a new status object
 int l_newStatus(lua_State *L) {
     // we don't want lua to create the status variable
+    // but if we did, we'd do it here.
     return 1;
 }
 
-// Lua function to free a status object
+// Lua function to free a status object (Garbage Collection)
 int l_freeStatus(lua_State *L) {
     // We don't want Lua to free the status variable
+    // but if we did, we'd do it here.
     return 0;
 }
 
 // Lua function to get the ticks of a status object
 int l_getStatusTicks(lua_State *L) {
-    long ticks = status->ticks;
-    lua_pushinteger(L, ticks);
+    lua_pushinteger(L, status->ticks);
     return 1;
 }
 
 // Lua function to set the ticks of a status object
 int l_setStatusTicks(lua_State *L) {
-    long ticks = luaL_checkinteger(L, 1);
-    status->ticks = ticks;
+    status->ticks = luaL_checkinteger(L, 1);
     return 0;
 }
 
 // Lua function to get the name of a status object
 int l_getStatusName(lua_State *L) {
-    char *name = status->name;
-    lua_pushstring(L, name);
+    lua_pushstring(L, status->name);
     return 1;
 }
 
 // Lua function to set the name of a status object
 int l_setStatusName(lua_State *L) {
-    char *name = (char *)luaL_checkstring(L, 1);
-    strcpy(status->name, name);
+    strcpy(status->name, (char *)luaL_checkstring(L, 1));
     return 0;
 }
 // List of functions to be registered with the status module
@@ -69,11 +66,10 @@ static const luaL_Reg status_functions[] = {
 int luaopen_status(lua_State *L) {
     // Create a table to hold the status functions
     luaL_newlib(L, status_functions);
-
-    // Return the table as the status module
     return 1;
 }
 
+// Function to load the module itself
 void load_status(lua_State *L) {
     // Register the status module with the LUA state
     luaL_requiref(L, "status", luaopen_status, 1);
