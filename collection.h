@@ -27,6 +27,6 @@ void setCollectionValue(Collection *collection, size_t index, int value);
 int getCollectionValue(Collection *collection, size_t index);
 
 // Load the Lua Library
-void load_collection(lua_State *L);
+void load_collection(lua_State *);
 
 #endif //LUAGSDEMO_COLLECTION_H

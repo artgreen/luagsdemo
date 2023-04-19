@@ -13,7 +13,7 @@ RES_DIR := resources
 DEMO_DISK := $(RES_DIR)/luags-demo.po
 DEMO_VOL := LUAGSDEMO
 
-names := main collection luacollection luastatus status luafuncs
+names := main collection luacollection luastatus status luafuncs luags
 SRCS := $(names:%=*.c)
 OBJS := $(foreach wrd, $(names),$(wrd).a)
 ADDS := $(foreach wrd, $(names),+$(wrd).a)
@@ -51,6 +51,7 @@ luacollection.a		: luacollection.c
 status.a			: status.c status.h
 luastatus.a			: luastatus.c
 luafuncs.a			: luafuncs.c luafuncs.h
+luags.a				: luags.c luags.h
 stattest.lua:
 	touch $@
 coltest.lua:

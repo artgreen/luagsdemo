@@ -14,6 +14,7 @@
 #include "collection.h"
 #include "status.h"
 #include "luafuncs.h"
+#include "luags.h"
 
 // global variable shared between C and Lua
 Status *status;
@@ -26,17 +27,18 @@ int main(int argc, char *argv[]) {
 
     // Initialize the LUA state
     printf("Initialize the LUA state\n");
-    lua_State *L = luaL_newstate();
+    lg_open(0);
+    lua_State *L = lg_state();
     printf("Opening libs\n");
     luaL_openlibs(L);
 
     // Load the LUA Collection library
     printf("Loading Lua interface libraries\n");
-    load_collection(L);
+    load_collection(lg_state());
     // Load the LUA Status library
-    load_status(L);
+    load_status(lg_state());
     // Export single functions
-    export_funcs(L);        // we'll call these in a Lua script below
+    export_funcs(lg_state());        // we'll call these in a Lua script below
 
     // Allocate the variable "status" to the Lua engine
     printf("Allocating the status variable\n");
@@ -46,21 +48,15 @@ int main(int argc, char *argv[]) {
 
     // Load and execute the Lua scripts
     for( int i = 0; i < 2; i++) {
-        printf("\nRunning %s...\n", files[i]);
-        if (luaL_dofile(L, files[i]) != LUA_OK) {
-            fprintf(stderr, "Error running script: %s\n", lua_tostring(L, -1));
-            break;
-        } else {
-            lua_pop(L, lua_gettop(L));
-        }
+        lg_run_file(files[i]);
     }
 
     // Close the LUA state
     // this will also call cleanup functions
-    lua_close(L);
+    lg_close();
     freeStatus(status);
 
     printf("Shutting down... byeeeeeeeeeeeeeeee!\nPress RETURN to exit");
-    char dummy[10]; gets(dummy);
+//    char dummy[10]; gets(dummy);
     return 0;
 }
