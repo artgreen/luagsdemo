@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     lua_close(L);
     freeStatus(status);
 
-    printf("Shutting down... byeeeeeeeeeeeeeeee!\n");
+    printf("Shutting down... byeeeeeeeeeeeeeeee!\nPress RETURN to exit");
     char dummy[10]; gets(dummy);
     return 0;
 }
