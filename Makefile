@@ -25,6 +25,7 @@ all: luademo demodisk
 luademo: $(OBJS)
 	iix link $(OBJS) $(LIB_DIR)/lvm $(LIB_DIR)/lua.lib KEEP=$@ || rm -f -- $@  # we need to delete the exe on error
 	iix chtyp -t exe $@
+	cp $@ $(RES_DIR)
 
 demodisk: luademo stattest.lua coltest.lua | $(RES_DIR)
 	$(AC) -pro800 $(DEMO_DISK) $(DEMO_VOL)
