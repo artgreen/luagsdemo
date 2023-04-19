@@ -4,12 +4,16 @@
 #pragma debug       0
 #pragma path "include"
 
+// Standard libraries
 #include <stdio.h>
+// Lua libraries
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
+// Local libraries
 #include "collection.h"
 #include "status.h"
+#include "luafuncs.h"
 
 // global variable shared between C and Lua
 Status *status;
@@ -31,13 +35,16 @@ int main(int argc, char *argv[]) {
     load_collection(L);
     // Load the LUA Status library
     load_status(L);
+    // Export single functions
+    export_funcs(L);        // we'll call these in a Lua script below
 
     // Allocate the variable "status" to the Lua engine
     printf("Allocating the status variable\n");
     status = newStatus(99, "Initial status");
 
+    printf("\nExecuting tests\n");
+
     // Load and execute the Lua scripts
-    printf("Executing tests\n");
     for( int i = 0; i < 2; i++) {
         printf("\nRunning %s...\n", files[i]);
         if (luaL_dofile(L, files[i]) != LUA_OK) {
@@ -51,6 +58,8 @@ int main(int argc, char *argv[]) {
     // Close the LUA state
     // this will also call cleanup functions
     lua_close(L);
+    freeStatus(status);
+
     printf("Shutting down... byeeeeeeeeeeeeeeee!\n");
     char dummy[10]; gets(dummy);
     return 0;

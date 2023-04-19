@@ -5,9 +5,10 @@ c = require("collection")
 nums = c.newCollection(10)
 
 -- Set some values in the collection
-c.setCollectionValue(nums, 0, 42)
-c.setCollectionValue(nums, 1, 23)
-c.setCollectionValue(nums, 2, 12)
+-- Notice we can call mul() defined earlier
+c.setCollectionValue(nums, 0, mul(4,10))
+c.setCollectionValue(nums, 1, mul(5,20))
+c.setCollectionValue(nums, 2, mul(5,30))
 c.setCollectionValue(nums, 3, 99)
 
 -- Get the size of the collection

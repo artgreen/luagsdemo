@@ -12,7 +12,7 @@ LIB_DIR := lib
 DEMO_DISK := luags-demo.po
 DEMO_VOL := LUAGSDEMO
 
-names := main collection luacollection luastatus status
+names := main collection luacollection luastatus status luafuncs
 SRCS := $(names:%=*.c)
 OBJS := $(foreach wrd, $(names),$(wrd).a)
 ADDS := $(foreach wrd, $(names),+$(wrd).a)
@@ -25,7 +25,7 @@ luademo: $(OBJS)
 	iix link $(OBJS) $(LIB_DIR)/lvm $(LIB_DIR)/lua.lib KEEP=$@ || rm -f -- $@  # we need to delete the exe on error
 	iix chtyp -t exe $@
 
-demodisk: luademo stattest.lua colltest.lua
+demodisk: luademo stattest.lua coltest.lua
 	$(AC) -pro800 $(DEMO_DISK) $(DEMO_VOL)
 	<luademo $(AC) -p $(DEMO_DISK) luademo exe
 	<luademo $(AC) -p $(DEMO_DISK) luademos16 s16
@@ -43,11 +43,12 @@ clean:
 main.a				: main.c
 collection.a		: collection.c collection.h
 luacollection.a		: luacollection.c
-status.a			: status.c
+status.a			: status.c status.h
 luastatus.a			: luastatus.c
+luafuncs.a			: luafuncs.c luafuncs.h
 stattest.lua:
 	touch $@
-colltest.lua:
+coltest.lua:
 	touch $@
 
 %.a:
