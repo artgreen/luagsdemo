@@ -34,12 +34,13 @@ int main(int argc, char *argv[]) {
     int num_scripts = lg_get_string_array("scripts", files);
 
     printf("\nLoading Lua interface modules\n");
+    // Load custom modules that we've written
     // Load the LUA Collection module
     lg_load_module(load_collection);
     // Load the LUA Status module
     lg_load_module(load_status);
     // Export single functions
-    // we'll call these in a Lua script below
+    // we'll call these in the coltest Lua script below
     lg_load_module(export_funcs);
 
     // Allocate the variable "status" to the Lua engine
