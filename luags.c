@@ -5,10 +5,7 @@
 #pragma path        "include"
 #pragma noroot
 
-
 #include <stdio.h>
-#include <string.h>
-#include "luags.h"
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
