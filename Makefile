@@ -22,6 +22,9 @@ CFLAGS := -I -P -D
 .PHONY: all fixlib
 all: luademo demodisk
 
+run : clean luademo
+	iix luademo
+
 luademo: $(OBJS)
 	iix link $(OBJS) $(LIB_DIR)/lvm $(LIB_DIR)/lua.lib KEEP=$@ || rm -f -- $@  # we need to delete the exe on error
 	iix chtyp -t exe $@
@@ -33,6 +36,7 @@ demodisk: luademo stattest.lua coltest.lua | $(RES_DIR)
 	<luademo $(AC) -p $(DEMO_DISK) luademos16 s16
 	<stattest.lua $(AC) -ptx $(DEMO_DISK) stattest.lua
 	<coltest.lua $(AC) -ptx $(DEMO_DISK) coltest.lua
+	<config.lua $(AC) -ptx $(DEMO_DISK) config.lua
 	$(AC) -l $(DEMO_DISK)
 
 fixlib:
