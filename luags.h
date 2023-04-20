@@ -8,8 +8,8 @@ int lg_open(void);
 void lg_close(void);
 lua_State *lg_state(void);
 void lg_openlibs(void);
-const char *lg_run_file(char *);
+const char *lg_run_file(const char *file_name);
 void lg_load_module(void (*module_func)(lua_State *));
-void get_array(lua_State *L, char *name);
+void lg_get_string_array(char *name, const char **array);
 
 #endif //LUAGSDEMO_LUAGS_H

@@ -55,7 +55,7 @@ lua_State *lg_state(void) {
  * file_name: Name of a file containing Lua script or Lua bytecode
  * Returns: NULL on success, on failure returns the Lua error message
  */
-const char * lg_run_file(char *file_name) {
+const char * lg_run_file(const char *file_name) {
     printf("\nRunning %s...\n", file_name);
     if (luaL_dofile(_L, file_name) != LUA_OK) {
         return(lua_tostring(_L, -1));
@@ -88,10 +88,17 @@ void lg_load_module(void (*module_func)(lua_State *)) {
 /*
  *
  */
-void get_array(lua_State *L, char *name) {
-    char temp[15];
+void lg_get_string_array(char *name, const char **array) {
+    // Read the array from C
+    lua_getglobal(_L, "scripts");
+    lua_len(_L, -1);                     // Get the length of the array
+    int n = lua_tointeger(_L, -1);
+    lua_pop(_L, 1);                          // Pop the length from the stack
 
-    lua_getglobal(L, "scripts");
-    lua_rawgeti(L, -1, 1);      // foo is on the top, access with -1 and access to foo[1] with 1
-    strcpy(temp, lua_tostring(L, -1)); // foo[1] is now on the top of the stack
+    for (int i = 1; i <= n; i++) {
+        lua_pushinteger(_L, i);
+        lua_gettable(_L, -2);            // Get the value at index i
+        array[i-1] = lua_tostring(_L, -1);
+        lua_pop(_L, 1);                      // Pop the value from the stack
+    }
 }

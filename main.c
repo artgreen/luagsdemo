@@ -20,10 +20,11 @@
 Status *status;
 
 int main(int argc, char *argv[]) {
-    char *files[2] = {
-            "coltest.lua",
-            "stattest.lua",
-    };
+//    char *files[2] = {
+//            "coltest.lua",
+//            "stattest.lua",
+//    };
+    const char **files;
 
     // Initialize the LUA state
     printf("Initialize the LUA state\n");
@@ -32,7 +33,11 @@ int main(int argc, char *argv[]) {
     printf("Opening libs\n");
     lg_openlibs();
 
-    printf("Loading Lua interface modules\n");
+    printf("Reading config from config.lua\n");
+    lg_run_file("config.lua");
+    lg_get_string_array("scripts", files);
+
+    printf("\nLoading Lua interface modules\n");
     // Load the LUA Collection module
     lg_load_module(load_collection);
     // Load the LUA Status module
