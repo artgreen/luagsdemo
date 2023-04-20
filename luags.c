@@ -13,6 +13,9 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "luags.h"
+#include "luafuncs.h"
+#include "status.h"
+#include "collection.h"
 
 
 /*
@@ -77,6 +80,11 @@ const char * lg_run_file(char *file_name) {
 void lg_load_module(void (*module_func)(lua_State *)) {
     printf("Loading module at address %p\n", module_func);
     module_func(_L);
+//    load_collection(lg_state());
+//     Load the LUA Status library
+//    load_status(lg_state());
+//     Export single functions
+//    export_funcs(lg_state());
 }
 /*
  *

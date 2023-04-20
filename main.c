@@ -22,30 +22,30 @@ Status *status;
 int main(int argc, char *argv[]) {
     char *files[2] = {
             "coltest.lua",
-            "stattest.lua"
+            "stattest.lua",
     };
 
     // Initialize the LUA state
     printf("Initialize the LUA state\n");
     lg_open(0);
-    lua_State *L = lg_state();
-    printf("Opening libs\n");
-    luaL_openlibs(L);
 
-    // Load the LUA Collection library
-    printf("Loading Lua interface libraries\n");
-    load_collection(lg_state());
-    // Load the LUA Status library
-    load_status(lg_state());
+    printf("Opening libs\n");
+    luaL_openlibs(lg_state());
+
+    printf("Loading Lua interface modules\n");
+    // Load the LUA Collection module
+    lg_load_module(load_collection);
+    // Load the LUA Status module
+    lg_load_module(load_status);
     // Export single functions
-    export_funcs(lg_state());        // we'll call these in a Lua script below
+    // we'll call these in a Lua script below
+    lg_load_module(export_funcs);
 
     // Allocate the variable "status" to the Lua engine
     printf("Allocating the status variable\n");
     status = newStatus(99, "Initial status");
 
     printf("\nExecuting tests\n");
-
     // Load and execute the Lua scripts
     for( int i = 0; i < 2; i++) {
         lg_run_file(files[i]);
