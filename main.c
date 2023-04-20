@@ -20,10 +20,6 @@
 Status *status;
 
 int main(int argc, char *argv[]) {
-//    char *files[2] = {
-//            "coltest.lua",
-//            "stattest.lua",
-//    };
     const char **files;
 
     // Initialize the LUA state
@@ -33,9 +29,9 @@ int main(int argc, char *argv[]) {
     printf("Opening libs\n");
     lg_openlibs();
 
-    printf("Reading config from config.lua\n");
+    printf("Using Lua to configure ourselves via config.lua\n");
     lg_run_file("config.lua");
-    lg_get_string_array("scripts", files);
+    int num_scripts = lg_get_string_array("scripts", files);
 
     printf("\nLoading Lua interface modules\n");
     // Load the LUA Collection module
@@ -50,9 +46,9 @@ int main(int argc, char *argv[]) {
     printf("Allocating the status variable\n");
     status = newStatus(99, "Initial status");
 
-    printf("\nExecuting tests\n");
+    printf("\nExecuting %d tests\n", num_scripts);
     // Load and execute the Lua scripts
-    for( int i = 0; i < 2; i++) {
+    for( int i = 0; i < num_scripts; i++) {
         lg_run_file(files[i]);
     }
 

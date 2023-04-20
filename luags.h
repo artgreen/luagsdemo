@@ -10,6 +10,6 @@ lua_State *lg_state(void);
 void lg_openlibs(void);
 const char *lg_run_file(const char *file_name);
 void lg_load_module(void (*module_func)(lua_State *));
-void lg_get_string_array(char *name, const char **array);
+int lg_get_string_array(char *name, const char **array);
 
 #endif //LUAGSDEMO_LUAGS_H

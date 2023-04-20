@@ -86,19 +86,24 @@ void lg_load_module(void (*module_func)(lua_State *)) {
     module_func(_L);
 }
 /*
- *
+ *  Return a string array
+ *  name: name of the global variable in Lua
+ *  array: the base pointer to the string array.
+ *  Returns: number of elements in the array
+ *  The function allocates
  */
-void lg_get_string_array(char *name, const char **array) {
-    // Read the array from C
-    lua_getglobal(_L, "scripts");
-    lua_len(_L, -1);                     // Get the length of the array
-    int n = lua_tointeger(_L, -1);
+int lg_get_string_array(char *name, const char **array) {
+    lua_getglobal(_L, name);               // Lookup the global variable name
+
+    lua_len(_L, -1);                   // Get the length of the array
+    int n = lua_tointeger(_L, -1);           // Create our max count variable
     lua_pop(_L, 1);                          // Pop the length from the stack
 
     for (int i = 1; i <= n; i++) {
-        lua_pushinteger(_L, i);
-        lua_gettable(_L, -2);            // Get the value at index i
-        array[i-1] = lua_tostring(_L, -1);
-        lua_pop(_L, 1);                      // Pop the value from the stack
+        lua_pushinteger(_L, i);          // Push index we want onto stack
+        lua_gettable(_L, -2);           // Get the value at index i
+        array[i-1] = lua_tostring(_L, -1);    // Save the value in the array
+        lua_pop(_L, 1);                       // Pop the value from the stack
     }
+    return n;
 }
