@@ -51,10 +51,11 @@ int main(int argc, char *argv[]) {
 
     // Close the LUA state
     // this will also call cleanup functions
+    printf("Closing down Lua interface\n");
     lg_close();
     freeStatus(status);
 
     printf("Shutting down... byeeeeeeeeeeeeeeee!\nPress RETURN to exit");
-//    char dummy[10]; gets(dummy);
+    char dummy[10]; gets(dummy);
     return 0;
 }
