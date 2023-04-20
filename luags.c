@@ -5,6 +5,7 @@
 #pragma path        "include"
 #pragma noroot
 
+
 #include <stdio.h>
 #include "lua.h"
 #include "lualib.h"
@@ -43,12 +44,6 @@ void lg_close(void) {
     // this will also call cleanup functions
     lua_close(_L);
 }
-/*
- * Close the Lua library
- * No parameters
- * Returns: the current Lua state of this interface (_L).
- * In the event that another part of the program needs access to the Lua state.
- */
 lua_State *lg_state(void) {
     return _L;
 }
