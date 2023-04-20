@@ -5,9 +5,10 @@
 #pragma path        "include"
 #pragma noroot
 
+segment "luastatus";
+
 #include <stdlib.h>
 #include <string.h>
-
 #include "lua.h"
 #include "lauxlib.h"
 #include "status.h"
