@@ -6,6 +6,8 @@
 
 // Standard libraries
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 // Local libraries
 #include "collection.h"
 #include "status.h"
@@ -40,8 +42,9 @@ int main(int argc, char *argv[]) {
     lg_load_module(export_funcs);
 
     // Allocate the variable "status" to the Lua engine
-    printf("Allocating the status variable\n");
-    status = newStatus(99, "Initial status");
+    status = malloc(sizeof(Status));
+    status->ticks = 99;
+    strcpy(status->name, "Initial status");
 
     printf("\nExecuting %d tests\n", num_scripts);
     // Load and execute the Lua scripts
@@ -53,9 +56,9 @@ int main(int argc, char *argv[]) {
     // this will also call cleanup functions
     printf("Closing down Lua interface\n");
     lg_close();
-    freeStatus(status);
+    free(status);
 
-    printf("Shutting down... byeeeeeeeeeeeeeeee!\nPress RETURN to exit");
+    printf("Shutting down... byeeeeeeeeeeeeeeee!\nPress RETURN to exit\n");
     char dummy[10]; gets(dummy);
     return 0;
 }
