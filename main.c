@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     printf("Initialize the LUA state\n");
     lg_open();
 
-    printf("Opening libs\n");
+    printf("Opening Lua standard libraries\n");
     lg_openlibs();
 
     printf("Using Lua to configure ourselves via config.lua\n");
