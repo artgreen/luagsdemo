@@ -5,7 +5,7 @@
 #pragma path        "include"
 #pragma noroot
 
-segment "lua_collection";
+segment "luacollection";
 
 #include "lua.h"
 #include "lauxlib.h"
