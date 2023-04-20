@@ -35,7 +35,6 @@ int lg_open(void) {
     } else {
         return 0;
     }
-
 }
 /*
  * Close the Lua library
