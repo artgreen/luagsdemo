@@ -8,9 +8,12 @@ Examples showing how lua.lib could be embedded into an arbitrary C program.
 - Setting up the Lua engine
 - Creating a Lua module in C and exporting it to the Lua engine
 - Calling Lua script files
+- Using Lua as a configuration language
 - Exporting an arbitrary function to the Lua engine
 - Exporting a global C variable to the Lua engine
 - Showing how to access a struct in Lua (Lua requires getters and setters)
+
+Implements ths start of a C/Lua interface layer intended to hide Lua from the calling program altogether.
 
 Works as both a System16 program and ORCA EXE.
 
