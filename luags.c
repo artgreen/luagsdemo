@@ -31,12 +31,10 @@ lua_State *_L;
  * security concerns.
  * Returns: 0 on success, 1 on failure
  */
-int lg_open(int no_open) {
+int lg_open(void) {
     // Initialize the LUA state
     _L = luaL_newstate();
     if( _L != (lua_State *) NULL ) {
-        // do not open Lua libs if no_open is set
-        if( no_open ) luaL_openlibs(_L);
         return 1;
     } else {
         return 0;
@@ -71,20 +69,21 @@ const char * lg_run_file(char *file_name) {
     return (char *) NULL;
 }
 /*
- *
+ * Open standard Lua libraries
+ * This opens the standard Lua libraries for functions like print().
+ * You may not want to expose all libraries to running scripts if the scripts
+ * can be modified by users.  For example, they could use the files functions
+ * to open files in a script running in your program.
  */
-
+void lg_openlibs(void) {
+    luaL_openlibs(_L);
+}
 /*
  *
  */
 void lg_load_module(void (*module_func)(lua_State *)) {
     printf("Loading module at address %p\n", module_func);
     module_func(_L);
-//    load_collection(lg_state());
-//     Load the LUA Status library
-//    load_status(lg_state());
-//     Export single functions
-//    export_funcs(lg_state());
 }
 /*
  *

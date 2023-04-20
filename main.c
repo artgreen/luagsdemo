@@ -27,10 +27,10 @@ int main(int argc, char *argv[]) {
 
     // Initialize the LUA state
     printf("Initialize the LUA state\n");
-    lg_open(0);
+    lg_open();
 
     printf("Opening libs\n");
-    luaL_openlibs(lg_state());
+    lg_openlibs();
 
     printf("Loading Lua interface modules\n");
     // Load the LUA Collection module
