@@ -2,14 +2,10 @@
 #pragma optimize    9
 #pragma lint       -1
 #pragma debug       0
-#pragma path "include"
+#pragma path        "include"
 
 // Standard libraries
 #include <stdio.h>
-// Lua libraries
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
 // Local libraries
 #include "collection.h"
 #include "status.h"
