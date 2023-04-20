@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     // Close the LUA state
     // this will also call cleanup functions
-    printf("Closing down Lua interface\n");
+    printf("\nClosing down Lua interface\n");
     lg_close();
     free(status);
 
