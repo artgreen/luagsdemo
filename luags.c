@@ -110,3 +110,32 @@ int lg_get_string_array(char *name, const char **array) {
     }
     return n;
 }
+
+#include "lua.h"
+#include "lobject.h"
+
+void print_strt(lua_State *L) {
+    stringtable *strt = &G(L)->strt; // Get the strt hash table from the global_State struct
+    TString *ts; // Variable to store the TString object
+    int i; // Counter variable for the hash table buckets
+
+    printf("strt size: %d\n", strt->size); // Print the size of the hash table
+
+    // Loop through the hash table buckets
+    for (i = 0; i < strt->size; i++) {
+        ts = cast(TString *, strt->hash[i]); // Get the TString object from the GCObject pointer
+        // Loop through all objects in the bucket
+        while (ts) {
+            printf("Address: %p, String: %s, Next: %p\n", ts, getstr(ts), ts->u.hnext); // Print the address, string value, and next pointer
+            ts = ts->u.hnext; // Move to the next object in the bucket
+        }
+    }
+}
+
+
+
+void print(void) {
+    print_strt(_L);
+}
+
+
