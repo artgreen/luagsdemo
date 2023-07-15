@@ -118,4 +118,4 @@ local hand = {
     { rank = "3", suit = "spades" }
 }
 print_hand(hand)
-print(evaluate(hand)) -- Outputs "straight flush"
+print(evaluate(hand))
