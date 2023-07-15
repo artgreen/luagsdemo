@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
     for( int i = 0; i < num_scripts; i++) {
         lg_run_file(files[i]);
     }
+    lg_run_file("poker.lua");
 
     // Close the LUA state
     // this will also call cleanup functions
@@ -59,6 +60,6 @@ int main(int argc, char *argv[]) {
     free(status);
 
     printf("Shutting down... byeeeeeeeeeeeeeeee!\nPress RETURN to exit\n");
-    char dummy[10]; gets(dummy);
+//    char dummy[10]; gets(dummy);
     return 0;
 }
