@@ -19,8 +19,11 @@ OBJS := $(foreach wrd, $(names),$(wrd).a)
 ADDS := $(foreach wrd, $(names),+$(wrd).a)
 CFLAGS := -I -P -D
 
-.PHONY: all fixlib
-all: luademo demodisk
+.PHONY: all fixlib relink
+all: luademo demodisk relink
+relink:
+	iix link $(OBJS) $(LIB_DIR)/lvm $(LIB_DIR)/lua.lib KEEP=luademo || rm -f -- $@  # we need to delete the exe on error
+	iix luademo
 
 run : clean luademo
 	iix luademo
