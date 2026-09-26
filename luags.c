@@ -1,141 +1,126 @@
-
-#pragma optimize    9
-#pragma lint       -1
-#pragma debug       0
-#pragma path        "include"
+#pragma memorymodel 1
 #pragma noroot
-
-
 #include <stdio.h>
+#include <string.h>
 #include "lua.h"
-#include "lualib.h"
 #include "lauxlib.h"
 #include "luags.h"
 
-/*
- * Lua state
- * This interface will completely hide Lua internals.
- */
-lua_State *_L;
+static lua_State *state;
 
-/*
- * Connect to the Lua library
- * no_open: Boolean. If != 0, do not open the Lua library set. This is used to
- * control what libraries users can be called in scripts.  This can prevent
- * security concerns.
- * Returns: 0 on success, 1 on failure
- */
+/* Each operation restores the stack, including error paths. */
+static int finish(int status, int base) {
+    if (status != LUA_OK) {
+        const char *message = lua_tostring(state, -1);
+        fprintf(stderr, "Lua error: %s\n", message ? message : "non-string error");
+    }
+    lua_settop(state, base);
+    return status != LUA_OK;
+}
 int lg_open(void) {
-    // Initialize the LUA state
-    _L = luaL_newstate();
-    if( _L != (lua_State *) NULL ) {
-        return 1;
-    } else {
-        return 0;
-    }
+    if (state != NULL) return 1;
+    state = luaL_newstate();
+    return state == NULL;
 }
-/*
- * Close the Lua library
- * No parameters
- * Returns: nothing.
- */
 void lg_close(void) {
-    // Close the LUA state
-    // this will also call cleanup functions
-    lua_close(_L);
+    if (state != NULL) { lua_close(state); state = NULL; }
 }
-/*
- * Close the Lua library
- * No parameters
- * Returns: the current Lua state of this interface (_L).
- * In the event that another part of the program needs access to the Lua state.
- */
-lua_State *lg_state(void) {
-    return _L;
+int lg_initialize(lua_CFunction setup) {
+    int base = lua_gettop(state);
+    lua_pushcfunction(state, setup);
+    return finish(lua_pcall(state, 0, 0, 0), base);
 }
-/*
- * Execute a Lua script file
- * file_name: Name of a file containing Lua script or Lua bytecode
- * Returns: NULL on success, on failure returns the Lua error message
- */
-const char * lg_run_file(const char *file_name) {
-    printf("\nRunning %s...\n", file_name);
-    if (luaL_dofile(_L, file_name) != LUA_OK) {
-        return(lua_tostring(_L, -1));
-    } else {
-        lua_pop(_L, lua_gettop(_L));
+int lg_run_file(const char *name) {
+    int base = lua_gettop(state);
+    int status = luaL_loadfile(state, name);
+    if (status == LUA_OK) status = lua_pcall(state, 0, 0, 0);
+    return finish(status, base);
+}
+int lg_run_string(const char *code) {
+    int base = lua_gettop(state);
+    int status = luaL_loadstring(state, code);
+    if (status == LUA_OK) status = lua_pcall(state, 0, 0, 0);
+    return finish(status, base);
+}
+
+/* Accessors run inside Lua's error boundary too: a global lookup can invoke
+ * __index, and even an ordinary push may allocate. Requests live on the C
+ * caller's stack until the protected call returns. */
+static int request(lua_CFunction fn, void *data) {
+    int base = lua_gettop(state);
+    lua_pushcfunction(state, fn);
+    lua_pushlightuserdata(state, data);
+    return finish(lua_pcall(state, 1, 0, 0), base);
+}
+typedef struct { char (*files)[LG_PATH_SIZE]; int count; } ScriptRequest;
+static int read_scripts(lua_State *L) {
+    ScriptRequest *r = lua_touserdata(L, 1);
+    size_t n, i, length;
+    const char *value;
+    lua_getglobal(L, "scripts");
+    if (!lua_istable(L, -1)) goto invalid;
+    n = lua_rawlen(L, -1);
+    if (n > LG_MAX_SCRIPTS) goto invalid;
+    lua_pushnil(L);
+    while (lua_next(L, -2)) {
+        lua_Integer key;
+        if (!lua_isinteger(L, -2)) goto invalid;
+        key = lua_tointeger(L, -2);
+        if (key < 1 || key > (lua_Integer)n) goto invalid;
+        lua_pop(L, 1);
     }
-    return (char *) NULL;
-}
-/*
- * Open standard Lua libraries
- * This opens the standard Lua libraries for functions like print().
- * You may not want to expose all libraries to running scripts if the scripts
- * can be modified by users.  For example, they could use the files functions
- * to open files in a script running in your program.
- */
-void lg_openlibs(void) {
-    luaL_openlibs(_L);
-}
-/*
- * Load a custom module
- * module_func: a pointer to a function that sets up the custom module.
- * Returns: nothing.
- * The function's signature must be:
- *      void function_name(lua_State *L)
- */
-void lg_load_module(void (*module_func)(lua_State *)) {
-    printf("Loading module at address %p\n", module_func);
-    module_func(_L);
-}
-/*
- *  Return a string array
- *  name: name of the global variable in Lua
- *  array: the base pointer to the string array.
- *  Returns: number of elements in the array
- *  The function allocates
- */
-int lg_get_string_array(char *name, const char **array) {
-    lua_getglobal(_L, name);               // Lookup the global variable name
-
-    lua_len(_L, -1);                   // Get the length of the array
-    int n = lua_tointeger(_L, -1);           // Create our max count variable
-    lua_pop(_L, 1);                          // Pop the length from the stack
-
-    for (int i = 1; i <= n; i++) {
-        lua_pushinteger(_L, i);          // Push index we want onto stack
-        lua_gettable(_L, -2);           // Get the value at index i
-        array[i-1] = lua_tostring(_L, -1);    // Save the value in the array
-        lua_pop(_L, 1);                       // Pop the value from the stack
+    for (i = 1; i <= n; ++i) {
+        lua_rawgeti(L, -1, (lua_Integer)i);
+        if (lua_type(L, -1) != LUA_TSTRING) goto invalid;
+        value = lua_tolstring(L, -1, &length);
+        if (length == 0 || length >= LG_PATH_SIZE || memchr(value, 0, length)) goto invalid;
+        memcpy(r->files[i-1], value, length);
+        r->files[i-1][length] = 0;
+        lua_pop(L, 1);
     }
-    return n;
+    r->count = (int)n;
+    return 0;
+invalid:
+    return luaL_error(L, "Invalid scripts: expected an array of at most 8 nonempty paths (63 bytes each)");
 }
-
-#include "lua.h"
-#include "lobject.h"
-
-void print_strt(lua_State *L) {
-    stringtable *strt = &G(L)->strt; // Get the strt hash table from the global_State struct
-    TString *ts; // Variable to store the TString object
-    int i; // Counter variable for the hash table buckets
-
-    printf("strt size: %d\n", strt->size); // Print the size of the hash table
-
-    // Loop through the hash table buckets
-    for (i = 0; i < strt->size; i++) {
-        ts = cast(TString *, strt->hash[i]); // Get the TString object from the GCObject pointer
-        // Loop through all objects in the bucket
-        while (ts) {
-            printf("Address: %p, String: %s, Next: %p\n", ts, getstr(ts), ts->u.hnext); // Print the address, string value, and next pointer
-            ts = ts->u.hnext; // Move to the next object in the bucket
-        }
-    }
+int lg_get_scripts(char files[][LG_PATH_SIZE], int *count) {
+    ScriptRequest r;
+    int status;
+    r.files = files; r.count = 0;
+    status = request(read_scripts, &r);
+    *count = r.count;
+    return status;
 }
-
-
-
-void print(void) {
-    print_strt(_L);
+typedef struct { const char *name; lua_Integer value; } IntegerRequest;
+static int read_integer(lua_State *L) {
+    IntegerRequest *r = lua_touserdata(L, 1);
+    lua_getglobal(L, r->name);
+    if (!lua_isinteger(L, -1)) return luaL_error(L, "Expected integer global: %s", r->name);
+    r->value = lua_tointeger(L, -1);
+    return 0;
 }
-
-
+int lg_get_integer(const char *name, lua_Integer *value) {
+    IntegerRequest r;
+    int status;
+    r.name = name; r.value = 0;
+    status = request(read_integer, &r);
+    if (!status) *value = r.value;
+    return status;
+}
+static int call_integer(lua_State *L) {
+    IntegerRequest *r = lua_touserdata(L, 1);
+    lua_getglobal(L, r->name);
+    lua_pushinteger(L, r->value);
+    lua_call(L, 1, 1); /* request() protects lookup, call, and result validation. */
+    if (!lua_isinteger(L, -1)) return luaL_error(L, "Expected integer result: %s", r->name);
+    r->value = lua_tointeger(L, -1);
+    return 0;
+}
+int lg_call_integer(const char *name, lua_Integer arg, lua_Integer *result) {
+    IntegerRequest r;
+    int status;
+    r.name = name; r.value = arg;
+    status = request(call_integer, &r);
+    if (!status) *result = r.value;
+    return status;
+}

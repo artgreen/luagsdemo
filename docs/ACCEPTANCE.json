@@ -1,0 +1,18 @@
+{
+  "schema": "luagsdemo-hardware-acceptance/1",
+  "status": "accepted",
+  "evidence": "maintainer-reported",
+  "reported_date": "2026-09-26",
+  "statement": "hardware acceptance testing complete and good. proceed",
+  "reviewed_source_commit": "d4d4f82300072140be597bb8b9a3e5fec25d5224",
+  "executable_sha256": "43635f7890deacc47067cbeaf0425ed2b8e7363db368797024cd6016f5b21fd5",
+  "demo_inputs": {
+    "config.lua": "803432e98f62eeba3f2cd0a44bc8840dfd984cf1a50b0207cab265a3cb13fc5d",
+    "coltest.lua": "65861279a393e6a11757527e20f0a8b21ff369eaa8f001f8eee97e793b07a938",
+    "stattest.lua": "c6da3931a2e617118a31755a248e7c1141e8c332d7a25e376c22de0bacb0686b",
+    "shopdemo.lua": "3e0925065036d83f48fac833831d556a49a4402f0a6669bfad08281a90ed7207",
+    "policy.lua": "521f7e0264b2c407a359c7869d3765877de1582bc81025b3835e80478c328c32",
+    "stock.csv": "1a311f42553ee6b32209b57e8e685e29d5c9c5d15ae7aa94fa6487b1bc8a4d26"
+  },
+  "scope": "Successful hardware acceptance reported by the maintainer for the expanded shop demo. Machine details and a detailed transcript were not supplied."
+}

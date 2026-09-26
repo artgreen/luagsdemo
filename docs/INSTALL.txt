@@ -1,0 +1,34 @@
+Lua IIgs C/Lua shop demo
+
+Extract LUAGSDEMO.SHK using GS ShrinkIt, or copy all files from
+luagsdemo.po preserving ProDOS file types. The image is not bootable.
+
+From an ORCA-compatible shell, change to a writable extracted directory:
+  luademo
+
+The shop reads STOCK.CSV and uses two rules from POLICY.LUA.
+Expect a standard order plan totaling $192.00 from a $200 budget and a
+lean plan totaling $96.00 from a $100 budget. Tea and syrup are deferred;
+coffee and filters are ordered. Inventory stays unchanged.
+
+The job writes or replaces ORDERS.CSV and LEAN.CSV in this directory.
+These are recommendations only; no purchases are submitted. A failed
+write removes the partial report. Use these names only for generated reports.
+
+The smaller collection and status examples follow. Expect:
+  C -> Lua -> C: 21 -> 42
+  C sees status: 42, New status
+  Demo completed
+
+Run only the shop with: luademo --script shopdemo.lua
+Run a smaller example with: luademo --script coltest.lua
+Use another configuration with: luademo config.lua
+All paths resolve from the current directory. Edit POLICY.LUA to change
+budgets and stocking targets without recompiling the executable.
+
+This executable embeds Lua 5.4.6 from the Lua IIgs v0.3.0 full SDK.
+The maintainer reported successful IIgs acceptance on September 26, 2026.
+For future builds, repeat the job and report checks on your hardware.
+
+Source: https://github.com/artgreen/luagsdemo
+Lua port: https://github.com/artgreen/lua-iigs

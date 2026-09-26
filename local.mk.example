@@ -1,0 +1,7 @@
+# GoldenGate plus ORCA/C 2.2.x (the compiler SDK, not the Lua SDK).
+GOLDEN_GATE = /absolute/path/to/orca-sdk-2.2.1
+# Optional tool paths; otherwise found on PATH or ~/.local/bin.
+# IIX = /usr/local/bin/iix
+# NULIB2 = /usr/local/bin/nulib2
+# ACX = /absolute/path/to/acx
+# CP2 = /absolute/path/to/cp2

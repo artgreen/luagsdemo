@@ -1,0 +1,7 @@
+sku,name,on_hand,on_order,weekly_sales,pack,unit_cents
+COFFEE,Ground coffee,4,0,12,6,650
+TEA,Tea box,2,0,8,4,425
+FILTER,Coffee filters,1,0,6,10,180
+MUG,Ceramic mug,18,0,2,4,900
+COCOA,Cocoa tin,0,8,3,4,550
+SYRUP,Vanilla syrup,0,0,2,6,1200

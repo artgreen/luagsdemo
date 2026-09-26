@@ -1,3 +1,3 @@
-
--- Let's define some global variables and then access them from C
-scripts = {"coltest.lua", "stattest.lua"}
+-- Main application first, then the smaller API examples.
+-- Paths are relative to the launch directory.
+scripts = {"shopdemo.lua", "coltest.lua", "stattest.lua"}

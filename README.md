@@ -1,30 +1,150 @@
-# luagsdemo
-Program to demo embedding the IIgs flavor of LUA
+# Lua IIgs embedding demo
 
-Built using the lua.lib produced by https://github.com/artgreen/lua-iigs
+A working shop restocking planner, plus smaller C/Lua teaching examples. It embeds [Lua 5.4.6 for the Apple IIgs](https://github.com/artgreen/lua-iigs).
+It uses the published **v0.3.0 full SDK**, with the library, VM object, and public
+headers verified as one matched set. No Lua checkout or vendored binaries are required.
 
-Examples showing how lua.lib could be embedded into an arbitrary C program.
+The main application reads stock from CSV, applies two editable Lua policies,
+and writes purchasing recommendations within a C-enforced budget. Changing the
+rules requires no C rebuild. [Walk through the application](docs/SHOP.md).
 
-- Setting up the Lua engine
-- Creating a Lua module in C and exporting it to the Lua engine
-- Calling Lua script files
-- Using Lua as a configuration language
-- Exporting an arbitrary function to the Lua engine
-- Exporting a global C variable to the Lua engine
-- Showing how to access a struct in Lua (Lua requires getters and setters)
+The demo shows how to:
 
-Implements ths start of a C/Lua interface layer intended to hide Lua from the calling program altogether.
+- Import and validate inventory in C, call Lua rules for each item, and export CSV reports.
+- Enforce pack sizes, integer-cent totals, and purchasing budgets in C.
+- Initialize the IIgs native stack guard and a Lua state.
+- Register C modules and a standalone `mul()` function.
+- Read a script list from a Lua configuration file into C-owned storage.
+- Expose a collection as userdata with checked indices and safe finalization.
+- Read and update a C-owned status structure through Lua functions.
+- Run a Lua file or C string, retrieve a Lua global, and call a Lua function from C.
+- Report errors, restore the Lua stack, and close the state.
 
-Works as both a System16 program and ORCA EXE.
+## Downloads
 
-To do:
-- Execute a Lua script and then retrieve global Lua variables from C
-- Execute Lua code in a C string
-- Calling a Lua function from C
+[Version 0.1.0](https://github.com/artgreen/luagsdemo/releases/tag/v0.1.0) includes
+`LUAGSDEMO.SHK`, a ProDOS transfer image, validation records, and checksums.
+See [IIgs installation](docs/INSTALL.txt) to run it on hardware.
 
-Issues:
-- Sometimes I hear voices.
+## Build and run
 
-Powered by 
- - ORCA/C https://github.com/byteworksinc/ORCA-C
- - GoldenGate https://juiced.gs/store/golden-gate/
+On a development Mac, install GoldenGate, ORCA/C **2.2.x**, NuLib2, and Python **3.9+**.
+The ORCA/C toolchain and the Lua release SDK are separate dependencies.
+
+```sh
+cp local.mk.example local.mk
+# Edit GOLDEN_GATE in local.mk to point to your ORCA/C SDK.
+make doctor
+make sdk
+make run
+make test
+```
+
+`make sdk` downloads the versioned SDK ZIP and verifies its pinned SHA-256 before
+extracting `LUALIB.SHK` to `.deps/full/`. Subsequent builds work offline and
+recheck all library/header hashes. To use a downloaded ZIP offline, place it at
+`.deps/lua-iigs-0.3.0-sdk.zip` first. A modified cache fails verification instead
+of silently mixing builds. See `tools/demo.py` for the pinned URL and hash.
+
+`make` compiles all seven C translation units, links both `lvm.a` and `lua.lib`,
+and writes `build/luademo`. Each build is fresh; compiler/linker errors fail the
+command. `make run` launches the demo under GoldenGate with memory checking.
+`make clean` removes `build/`, retaining the verified SDK cache and transfer packages.
+Tests run in a disposable directory and leave your generated shop reports alone.
+Machine-specific settings belong in ignored `local.mk`.
+
+The normal run compares a two-week stock policy ($192 within a $200 budget)
+with a lean one-week policy ($96 within a $100 budget). It writes or replaces
+`orders.csv` and `lean.csv` in the launch directory; run from a writable directory.
+These are recommendations: no inventory is changed and no purchases are submitted.
+The smaller examples follow, ending with:
+
+```text
+C -> Lua -> C: 21 -> 42
+C sees status: 42, New status
+Demo completed
+```
+
+## Scripts and bindings
+
+`config.lua` defines `scripts`, an array of at most eight nonempty paths of up to
+63 bytes each. Paths resolve from the launch directory. The default sequence runs
+`shopdemo.lua`, `coltest.lua`, and `stattest.lua`. The shop example reads `stock.csv`
+and loads `policy.lua`; the other two demonstrate the collection and status APIs.
+For direct GoldenGate commands, export `GOLDEN_GATE` in your shell as well as setting it in `local.mk`:
+
+```sh
+export GOLDEN_GATE=/absolute/path/to/orca-sdk-2.2.1
+iix --memcheck build/luademo
+iix --memcheck build/luademo config.lua
+iix --memcheck build/luademo --script shopdemo.lua
+iix --memcheck build/luademo --script coltest.lua
+```
+
+```lua
+local collection = require("collection")
+local values <close> = collection.new(10)
+values:set(1, mul(40000, 2))
+print(values:get(1)) -- 80000, preserving 32-bit Lua integers
+```
+
+Collections have **one-based** indices, sizes from 1 to 4096, and `size`, `get`,
+`set`, and `close` methods. Explicit close, Lua 5.4 scope exit, and garbage
+collection share an idempotent finalizer. Access after close raises a Lua error.
+The host owns `status`; Lua may change its integer ticks and its name (at most
+19 bytes, no embedded NUL). `mul` follows Lua integer wrapping arithmetic.
+
+Only public Lua headers are used. The stack anchor lives in `main` through
+`lua_close`, as required by the SDK. The `lg_` wrapper owns one state and uses
+zero for success. It is an educational, single-threaded interface; scripts are
+trusted application code and can use the standard libraries. It is not a sandbox.
+
+## Test and transfer to an IIgs
+
+`make test` builds both the application and a C host test, then exercises the
+actual IIgs binaries through GoldenGate `--memcheck`. Tests cover the default
+flow, configuration errors, Lua error recovery, callbacks, integer widths,
+bounds, explicit/automatic cleanup, and status string limits. Shop tests cover
+CSV import errors, callbacks, immutable snapshots, whole-pack orders, budget
+boundaries, exact report totals, and CSV quoting. Results and exact
+executable hashes are written to `build/TEST-REPORT.json` and
+`build/BUILD-MANIFEST.json`. `make check` runs the SDK cache checks without the
+IIgs toolchain; the GitHub workflow runs these tooling checks only.
+
+With AppleCommander **acx** and CiderPress II **cp2** installed:
+
+```sh
+make package
+```
+
+This rebuilds and tests before producing `dist/LUAGSDEMO.SHK` and
+`dist/luagsdemo.po`, plus manifests and checksums. Every container member is
+read back and compared byte-for-byte, including ProDOS type/aux metadata.
+Use GS ShrinkIt or copy from the transfer image preserving file types. Run
+`luademo` from an ORCA-compatible shell in the extracted directory.
+See [IIgs installation](docs/INSTALL.txt), [validation results](docs/VALIDATION.md),
+and the [release procedure](docs/RELEASING.md).
+
+The maintainer reported successful real IIgs acceptance on September 26, 2026.
+The [acceptance record](docs/ACCEPTANCE.json) identifies the tested executable
+and Lua/data inputs. The current package supplies an ORCA shell EXE;
+System16 launching has not been revalidated.
+
+## Changes from the original demo
+
+The obsolete bundled headers, library, VM object, and executable are removed.
+The former zero-based collection API is replaced by the methods shown above.
+The uninitialized configuration pointer, unchecked allocations, double-free,
+unbounded status copy, ignored script errors, and 16-bit C integer truncation
+are fixed. The old Lua-internal string-table dumper, unused poker script, and
+obsolete screenshot are removed; their earlier versions remain in Git history.
+Current game examples live in the Lua IIgs distribution.
+
+## Acknowledgments
+
+Part of giving back to the Apple community by bringing useful tools to the IIgs.
+Powered by [ORCA/C](https://github.com/byteworksinc/ORCA-C),
+[GoldenGate](https://juiced.gs/store/golden-gate/), and [Lua](https://www.lua.org/).
+The original C-function example drew on
+[Lucas Klassmann's embedding tutorial](https://lucasklassmann.com/blog/2019-02-02-embedding-lua-in-c/).
+The downloaded SDK retains Lua's license; transfer packages include it.

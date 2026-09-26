@@ -1,15 +1,15 @@
-
-#ifndef LUAGSDEMO_LUAGS_H
-#define LUAGSDEMO_LUAGS_H
-
-#include "lstate.h"
-
+#ifndef LUAGS_H
+#define LUAGS_H
+#include "lua.h"
+#define LG_MAX_SCRIPTS 8
+#define LG_PATH_SIZE 64
+/* One state, owned by this interface. Zero means success throughout. */
 int lg_open(void);
 void lg_close(void);
-lua_State *lg_state(void);
-void lg_openlibs(void);
-const char *lg_run_file(const char *file_name);
-void lg_load_module(void (*module_func)(lua_State *));
-int lg_get_string_array(char *name, const char **array);
-
-#endif //LUAGSDEMO_LUAGS_H
+int lg_initialize(lua_CFunction setup);
+int lg_run_file(const char *name);
+int lg_run_string(const char *code);
+int lg_get_scripts(char files[][LG_PATH_SIZE], int *count);
+int lg_get_integer(const char *name, lua_Integer *value);
+int lg_call_integer(const char *name, lua_Integer arg, lua_Integer *result);
+#endif
