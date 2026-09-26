@@ -1,8 +1,5 @@
-
-#ifndef LUAGSDEMO_LUAFUNCS_H
-#define LUAGSDEMO_LUAFUNCS_H
-
-int multiplication(lua_State *L);
+#ifndef LUAFUNCS_H
+#define LUAFUNCS_H
+#include "lua.h"
 void export_funcs(lua_State *L);
-
-#endif //LUAGSDEMO_LUAFUNCS_H
+#endif

@@ -1,35 +1,17 @@
-
-#pragma optimize    9
-#pragma lint       -1
-#pragma debug       0
-#pragma path        "include"
+#pragma memorymodel 1
 #pragma noroot
-
-segment "collection";
-
 #include <stdlib.h>
 #include "collection.h"
-
 Collection *newCollection(size_t size) {
-    Collection *collection = (Collection *)malloc(sizeof(Collection));
-    collection->data = (int *)calloc(size, sizeof(int));
-    collection->size = size;
-    return collection;
+    Collection *c;
+    if (size == 0 || size > (size_t)-1 / sizeof(lua_Integer)) return NULL;
+    c = malloc(sizeof(*c));
+    if (c == NULL) return NULL;
+    c->data = calloc(size, sizeof(lua_Integer));
+    if (c->data == NULL) { free(c); return NULL; }
+    c->size = size;
+    return c;
 }
-
-void freeCollection(Collection *collection) {
-    free(collection->data);
-    free(collection);
-}
-
-size_t getCollectionSize(Collection *collection) {
-    return collection->size;
-}
-
-void setCollectionValue(Collection *collection, size_t index, int value) {
-    collection->data[index] = value;
-}
-
-int getCollectionValue(Collection *collection, size_t index) {
-    return collection->data[index];
+void freeCollection(Collection *c) {
+    if (c != NULL) { free(c->data); free(c); }
 }

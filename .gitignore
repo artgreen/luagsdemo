@@ -1,5 +1,10 @@
-# Project exclude paths
-/cmake-build-debug/
+/build/
+/dist/
+/.deps/
+/local.mk
+/.orca-sdk-*/
 *.a
 *.root
 *.sym
+__pycache__/
+.DS_Store

@@ -1,3 +1,3 @@
-
--- Let's define some global variables and then access them from C
+-- Paths are relative to the directory where luademo is launched.
+-- Up to eight scripts; each path may contain at most 63 bytes.
 scripts = {"coltest.lua", "stattest.lua"}

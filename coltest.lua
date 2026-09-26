@@ -1,27 +1,11 @@
--- Load the collection library
-c = require("collection")
-
--- Create a new collection object
-nums = c.newCollection(10)
-
--- Set some values in the collection
--- Notice we can call mul() defined earlier
-c.setCollectionValue(nums, 0, mul(4,10))
-c.setCollectionValue(nums, 1, mul(5,20))
-c.setCollectionValue(nums, 2, mul(5,30))
-c.setCollectionValue(nums, 3, 99)
-
--- Get the size of the collection
-size = c.getCollectionSize(nums)
-print("Collection size:     ", size)
-
--- Get some values from the collection
-print("Values in nums:")
-for i = 0, size - 1 do
-    value = c.getCollectionValue(nums, i)
-    print(i, "     ", value)
-end
-
--- Free the collection
-c.freeCollection(nums)
-
+local collection = require("collection")
+-- Lua indices start at one. Scope exit closes this C-owned allocation;
+-- its GC finalizer is also safe after an explicit close.
+local nums <close> = collection.new(10)
+nums:set(1, mul(4, 10))
+nums:set(2, mul(5, 20))
+nums:set(3, mul(5, 30))
+nums:set(4, 99)
+print("Collection size:", nums:size())
+for i = 1, nums:size() do print(i, nums:get(i)) end
+assert(nums:get(1) == 40 and nums:get(10) == 0)

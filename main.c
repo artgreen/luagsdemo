@@ -1,65 +1,52 @@
-
-#pragma optimize    9
-#pragma lint       -1
-#pragma debug       0
-#pragma path        "include"
-
-// Standard libraries
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-// Local libraries
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
 #include "collection.h"
 #include "status.h"
 #include "luafuncs.h"
 #include "luags.h"
+#pragma memorymodel 1
+#pragma stacksize LUA_IIGS_STACK_SIZE
 
-// global variable shared between C and Lua
-Status *status;
-
-int main(int argc, char *argv[]) {
-    const char **files;
-
-    // Initialize the LUA state
-    printf("Initialize the LUA state\n");
-    lg_open();
-
-    printf("Opening Lua standard libraries\n");
-    lg_openlibs();
-
-    printf("Using Lua to configure ourselves via config.lua\n");
-    lg_run_file("config.lua");
-    int num_scripts = lg_get_string_array("scripts", files);
-
-    printf("\nLoading Lua interface modules\n");
-    // Load custom modules that we've written
-    // Load the LUA Collection module
-    lg_load_module(load_collection);
-    // Load the LUA Status module
-    lg_load_module(load_status);
-    // Export single functions
-    // we'll call these in the coltest Lua script below
-    lg_load_module(export_funcs);
-
-    // Allocate the variable "status" to the Lua engine
-    status = malloc(sizeof(Status));
-    status->ticks = 99;
-    strcpy(status->name, "Initial status");
-
-    printf("\nExecuting %d tests\n", num_scripts);
-    // Load and execute the Lua scripts
-    for( int i = 0; i < num_scripts; i++) {
-        lg_run_file(files[i]);
-    }
-    lg_run_file("poker.lua");
-
-    // Close the LUA state
-    // this will also call cleanup functions
-    printf("\nClosing down Lua interface\n");
-    lg_close();
-    free(status);
-
-    printf("Shutting down... byeeeeeeeeeeeeeeee!\nPress RETURN to exit\n");
-//    char dummy[10]; gets(dummy);
+Status app_status = {99, "Initial status"};
+static int setup(lua_State *L) {
+    luaL_openlibs(L);
+    luaL_requiref(L, "collection", luaopen_collection, 1); lua_pop(L, 1);
+    luaL_requiref(L, "status", luaopen_status, 1); lua_pop(L, 1);
+    export_funcs(L);
     return 0;
+}
+int main(int argc, char *argv[]) {
+    char anchor; /* This frame stays alive through lua_close. */
+    char files[LG_MAX_SCRIPTS][LG_PATH_SIZE];
+    lua_Integer count_value, answer;
+    int count, i, result = 1;
+    if (argc > 3 || (argc == 3 && strcmp(argv[1], "--script"))) {
+        fprintf(stderr, "Usage: luademo [config.lua] | --script file.lua\n");
+        return 1;
+    }
+    lua_iigs_initstack(&anchor);
+    if (lg_open()) { fprintf(stderr, "Cannot create Lua state\n"); return 1; }
+    if (lg_initialize(setup)) goto done;
+    if (argc == 3) { result = lg_run_file(argv[2]); goto done; }
+    if (lg_run_file(argc == 2 ? argv[1] : "config.lua")) goto done;
+    if (lg_get_scripts(files, &count)) goto done;
+    printf("Lua IIgs embedding demo: %d scripts\n", count);
+    for (i = 0; i < count; ++i) {
+        printf("Running %s\n", files[i]);
+        if (lg_run_file(files[i])) goto done;
+    }
+    /* The remaining original TODOs: C strings, globals, and Lua callbacks. */
+    if (lg_run_string("host_value = 21; function double_value(n) return n * 2 end")) goto done;
+    if (lg_get_integer("host_value", &count_value)) goto done;
+    if (lg_call_integer("double_value", count_value, &answer)) goto done;
+    printf("C -> Lua -> C: %ld -> %ld\n", (long)count_value, (long)answer);
+    printf("C sees status: %ld, %s\n", (long)app_status.ticks, app_status.name);
+    result = 0;
+done:
+    lg_close();
+    if (!result) printf("Demo completed\n");
+    return result;
 }

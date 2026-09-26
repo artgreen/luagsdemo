@@ -1,0 +1,21 @@
+Lua IIgs embedding demo
+
+Extract LUAGSDEMO.SHK using GS ShrinkIt, or copy all files from
+luagsdemo.po preserving ProDOS file types. The image is not bootable.
+
+From an ORCA-compatible shell, change to the extracted directory and run:
+  luademo
+
+Expect collection values, status updated to 42 / New status,
+C -> Lua -> C: 21 -> 42, and Demo completed. It returns to the shell.
+
+Run one script with: luademo --script coltest.lua
+Use another configuration with: luademo config.lua
+All script paths are relative to the current working directory.
+
+This executable embeds Lua 5.4.6 from the Lua IIgs v0.3.0 full SDK.
+GoldenGate validation does not certify this new host on real hardware.
+Please run the default demo and both scripts on your IIgs before release.
+
+Source: https://github.com/artgreen/luagsdemo
+Lua port: https://github.com/artgreen/lua-iigs
