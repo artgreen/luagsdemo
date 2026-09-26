@@ -44,7 +44,13 @@ edit for the unchanged application executable are recorded in `build/shop-instal
 
 ## Real IIgs acceptance
 
-GoldenGate checks do not certify this expanded host on real hardware. Extract
+The maintainer reported “hardware acceptance testing complete and good” on
+September 26, 2026 and approved publication. [ACCEPTANCE.json](ACCEPTANCE.json)
+records this report and the accepted executable and Lua/data hashes. Machine
+details and a detailed transcript were not supplied. GoldenGate results remain
+a separate source of validation.
+
+For future builds, repeat the acceptance procedure: extract
 the package into a writable directory and run `luademo` in an ORCA-compatible
 shell. Confirm the $192/$96 plans, inspect `ORDERS.CSV` and `LEAN.CSV`, and
 confirm the smaller examples complete and return to the shell. Edit the

@@ -20,6 +20,12 @@ The demo shows how to:
 - Run a Lua file or C string, retrieve a Lua global, and call a Lua function from C.
 - Report errors, restore the Lua stack, and close the state.
 
+## Downloads
+
+[Version 0.1.0](https://github.com/artgreen/luagsdemo/releases/tag/v0.1.0) includes
+`LUAGSDEMO.SHK`, a ProDOS transfer image, validation records, and checksums.
+See [IIgs installation](docs/INSTALL.txt) to run it on hardware.
+
 ## Build and run
 
 On a development Mac, install GoldenGate, ORCA/C **2.2.x**, NuLib2, and Python **3.9+**.
@@ -119,9 +125,10 @@ Use GS ShrinkIt or copy from the transfer image preserving file types. Run
 See [IIgs installation](docs/INSTALL.txt), [validation results](docs/VALIDATION.md),
 and the [release procedure](docs/RELEASING.md).
 
-The new host has been tested under GoldenGate. **Real IIgs acceptance is still
-required.** The old project's System16 launch claim has not been revalidated;
-the current package supplies an ORCA shell EXE only.
+The maintainer reported successful real IIgs acceptance on September 26, 2026.
+The [acceptance record](docs/ACCEPTANCE.json) identifies the tested executable
+and Lua/data inputs. The current package supplies an ORCA shell EXE;
+System16 launching has not been revalidated.
 
 ## Changes from the original demo
 

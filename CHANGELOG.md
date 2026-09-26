@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.0 — 2026-09-26
 
 - Replace bundled Lua headers and binaries with a verified Lua IIgs v0.3.0 SDK.
 - Add a shop restocking application: C owns inventory, validation, budgets,
@@ -12,5 +12,6 @@
 - Run regression tests in an isolated directory; add offline SDK tooling CI.
 - Remove the obsolete executable, internal headers, poker script, and screenshot.
 
-GoldenGate validation is recorded in `docs/VALIDATION.md`. Real IIgs acceptance
-of this application has not yet been recorded.
+GoldenGate validation is recorded in `docs/VALIDATION.md`. The maintainer
+reported successful hardware acceptance; `docs/ACCEPTANCE.json` records the
+accepted executable and Lua/data inputs.

@@ -27,8 +27,8 @@ All paths resolve from the current directory. Edit POLICY.LUA to change
 budgets and stocking targets without recompiling the executable.
 
 This executable embeds Lua 5.4.6 from the Lua IIgs v0.3.0 full SDK.
-GoldenGate validation does not certify this new host on real hardware.
-Please run the job on your IIgs and check both reports before release.
+The maintainer reported successful IIgs acceptance on September 26, 2026.
+For future builds, repeat the job and report checks on your hardware.
 
 Source: https://github.com/artgreen/luagsdemo
 Lua port: https://github.com/artgreen/lua-iigs
