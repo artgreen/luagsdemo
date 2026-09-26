@@ -8,3 +8,7 @@
 *.sym
 __pycache__/
 .DS_Store
+
+# Reports written by the shop demo
+/orders.csv
+/lean.csv

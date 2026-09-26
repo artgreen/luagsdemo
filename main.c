@@ -7,6 +7,7 @@
 #include "status.h"
 #include "luafuncs.h"
 #include "luags.h"
+#include "inventory.h"
 #pragma memorymodel 1
 #pragma stacksize LUA_IIGS_STACK_SIZE
 
@@ -15,6 +16,7 @@ static int setup(lua_State *L) {
     luaL_openlibs(L);
     luaL_requiref(L, "collection", luaopen_collection, 1); lua_pop(L, 1);
     luaL_requiref(L, "status", luaopen_status, 1); lua_pop(L, 1);
+    luaL_requiref(L, "inventory", luaopen_inventory, 1); lua_pop(L, 1);
     export_funcs(L);
     return 0;
 }

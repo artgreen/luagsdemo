@@ -1,11 +1,17 @@
 # Lua IIgs embedding demo
 
-A small C application that embeds [Lua 5.4.6 for the Apple IIgs](https://github.com/artgreen/lua-iigs).
+A working shop restocking planner, plus smaller C/Lua teaching examples. It embeds [Lua 5.4.6 for the Apple IIgs](https://github.com/artgreen/lua-iigs).
 It uses the published **v0.3.0 full SDK**, with the library, VM object, and public
 headers verified as one matched set. No Lua checkout or vendored binaries are required.
 
+The main application reads stock from CSV, applies two editable Lua policies,
+and writes purchasing recommendations within a C-enforced budget. Changing the
+rules requires no C rebuild. [Walk through the application](docs/SHOP.md).
+
 The demo shows how to:
 
+- Import and validate inventory in C, call Lua rules for each item, and export CSV reports.
+- Enforce pack sizes, integer-cent totals, and purchasing budgets in C.
 - Initialize the IIgs native stack guard and a Lua state.
 - Register C modules and a standalone `mul()` function.
 - Read a script list from a Lua configuration file into C-owned storage.
@@ -34,13 +40,17 @@ recheck all library/header hashes. To use a downloaded ZIP offline, place it at
 `.deps/lua-iigs-0.3.0-sdk.zip` first. A modified cache fails verification instead
 of silently mixing builds. See `tools/demo.py` for the pinned URL and hash.
 
-`make` compiles all six C translation units, links both `lvm.a` and `lua.lib`,
+`make` compiles all seven C translation units, links both `lvm.a` and `lua.lib`,
 and writes `build/luademo`. Each build is fresh; compiler/linker errors fail the
 command. `make run` launches the demo under GoldenGate with memory checking.
 `make clean` removes `build/`, retaining the verified SDK cache and transfer packages.
 Machine-specific settings belong in ignored `local.mk`.
 
-The normal run ends with:
+The normal run compares a two-week stock policy ($192 within a $200 budget)
+with a lean one-week policy ($96 within a $100 budget). It writes or replaces
+`orders.csv` and `lean.csv` in the launch directory; run from a writable directory.
+These are recommendations: no inventory is changed and no purchases are submitted.
+The smaller examples follow, ending with:
 
 ```text
 C -> Lua -> C: 21 -> 42
@@ -51,14 +61,16 @@ Demo completed
 ## Scripts and bindings
 
 `config.lua` defines `scripts`, an array of at most eight nonempty paths of up to
-63 bytes each. Paths resolve from the launch directory. `coltest.lua` demonstrates
-the collection; `stattest.lua` updates the host's status. For direct GoldenGate
+63 bytes each. Paths resolve from the launch directory. The default sequence runs
+`shopdemo.lua`, `coltest.lua`, and `stattest.lua`. The shop example reads `stock.csv`
+and loads `policy.lua`; the other two demonstrate the collection and status APIs. For direct GoldenGate
 commands, export `GOLDEN_GATE` in your shell as well as setting it in `local.mk`:
 
 ```sh
 export GOLDEN_GATE=/absolute/path/to/orca-sdk-2.2.1
 iix --memcheck build/luademo
 iix --memcheck build/luademo config.lua
+iix --memcheck build/luademo --script shopdemo.lua
 iix --memcheck build/luademo --script coltest.lua
 ```
 
@@ -85,7 +97,9 @@ trusted application code and can use the standard libraries. It is not a sandbox
 `make test` builds both the application and a C host test, then exercises the
 actual IIgs binaries through GoldenGate `--memcheck`. Tests cover the default
 flow, configuration errors, Lua error recovery, callbacks, integer widths,
-bounds, explicit/automatic cleanup, and status string limits. Results and exact
+bounds, explicit/automatic cleanup, and status string limits. Shop tests cover
+CSV import errors, callbacks, immutable snapshots, whole-pack orders, budget
+boundaries, exact report totals, and CSV quoting. Results and exact
 executable hashes are written to `build/TEST-REPORT.json` and `BUILD-MANIFEST.json`.
 
 With AppleCommander **acx** and CiderPress II **cp2** installed:

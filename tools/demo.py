@@ -19,7 +19,8 @@ BUILD = ROOT / 'build'
 SDK_NAME = 'lua-iigs-0.3.0-sdk.zip'
 SDK_SHA256 = 'bc12d3da7b0d5d11e67d3d6997ae245b1ca06684c267e5dc19f6a6082119fcda'
 SDK_URL = 'https://github.com/artgreen/lua-iigs/releases/download/v0.3.0/' + SDK_NAME
-UNITS = ('main', 'collection', 'luacollection', 'luastatus', 'luafuncs', 'luags')
+DEMO_INPUTS = ('config.lua', 'coltest.lua', 'stattest.lua', 'shopdemo.lua', 'policy.lua', 'stock.csv')
+UNITS = ('main', 'collection', 'luacollection', 'luastatus', 'luafuncs', 'luags', 'inventory')
 
 
 def digest(data):
@@ -124,7 +125,8 @@ def build():
     run([iix, 'link', *UNITS, '../../.deps/full/lvm', '../../.deps/full/lua.lib', 'KEEP=../luademo'], cwd=obj)
     run([iix, 'chtyp', '-t', 'exe', executable])
     record = {'sdk': SDK_NAME, 'sdk_sha256': SDK_SHA256, 'orca_c': version,
-              'sources': inputs, 'executable_sha256': digest(executable.read_bytes())}
+              'sources': inputs, 'demo_inputs': {n: digest((ROOT / n).read_bytes()) for n in DEMO_INPUTS},
+              'executable_sha256': digest(executable.read_bytes())}
     (BUILD / 'BUILD-MANIFEST.json').write_text(json.dumps(record, indent=2) + '\n')
     print('Built', executable)
     return executable
@@ -155,7 +157,7 @@ def package(executable):
         stage = Path(temp)
         image, archive = stage / 'luagsdemo.po', stage / 'LUAGSDEMO.SHK'
         members = {'LUADEMO': (executable.read_bytes(), 'EXE', 0xB5)}
-        for name in ('config.lua', 'coltest.lua', 'stattest.lua'):
+        for name in DEMO_INPUTS:
             data = (ROOT / name).read_bytes().replace(b'\r\n', b'\n').replace(b'\n', b'\r')
             members[name.upper()] = (data, 'TXT', 0x04)
         members['README.TXT'] = ((ROOT / 'docs/INSTALL.txt').read_bytes().replace(b'\n', b'\r'), 'TXT', 0x04)
