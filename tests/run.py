@@ -1,14 +1,27 @@
 """Run the actual IIgs binaries; no desktop Lua substitute."""
+import atexit
 import csv
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
 
-ROOT = Path(__file__).resolve().parents[1]
+PROJECT = Path(__file__).resolve().parents[1]
 iix, exe = sys.argv[1:]
+exe = str(Path(exe).resolve())
+# Run scripts in a disposable copy: tests must not overwrite the user's reports.
+work = tempfile.TemporaryDirectory(prefix='test-run-', dir=PROJECT / 'build')
+atexit.register(work.cleanup)
+ROOT = Path(work.name)
+(ROOT / 'build').mkdir()
+(ROOT / 'tests').mkdir()
+for name in ('config.lua', 'coltest.lua', 'stattest.lua', 'shopdemo.lua', 'policy.lua', 'stock.csv'):
+    shutil.copyfile(PROJECT / name, ROOT / name)
+for source in (PROJECT / 'tests').glob('*.lua'):
+    shutil.copyfile(source, ROOT / 'tests' / source.name)
 results = []
 stock_before = hashlib.sha256((ROOT / 'stock.csv').read_bytes()).hexdigest()
 def check(name, args, ok, expected, executable=exe):
@@ -47,7 +60,7 @@ except (OSError, KeyError):
 results.append({'name': 'CSV quoting', 'passed': quoted_ok})
 print(('PASS ' if quoted_ok else 'FAIL ') + 'CSV quoting')
 check('binding bounds, lifetimes, and integer widths', ['--script', 'tests/bindings.lua'], True, ['Binding checks passed'])
-check('C host error recovery', [], True, ['Host checks passed'], str(ROOT / 'build/hosttest'))
+check('C host error recovery', [], True, ['Host checks passed'], str(PROJECT / 'build/hosttest'))
 check('missing script', ['--script', 'tests/does-not-exist.lua'], False, ['Lua error:'])
 check('missing config', ['tests/does-not-exist.lua'], False, ['Lua error:'])
 check('invalid arguments', ['a', 'b'], False, ['Usage:'])
@@ -117,8 +130,8 @@ results.append({'name': 'inventory stays unchanged', 'passed': hashlib.sha256((R
 report = {'environment': 'GoldenGate --memcheck; not real hardware',
           'executable_sha256': hashlib.sha256(Path(exe).read_bytes()).hexdigest(),
           'demo_inputs': {n: hashlib.sha256((ROOT / n).read_bytes()).hexdigest() for n in ('config.lua', 'coltest.lua', 'stattest.lua', 'shopdemo.lua', 'policy.lua', 'stock.csv')},
-          'test_sources': {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((ROOT / 'tests').glob('*')) if p.is_file()},
+          'test_sources': {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((PROJECT / 'tests').glob('*')) if p.is_file()},
           'total': len(results), 'failed': sum(not r['passed'] for r in results), 'checks': results}
-(ROOT / 'build/TEST-REPORT.json').write_text(json.dumps(report, indent=2) + '\n')
+(PROJECT / 'build/TEST-REPORT.json').write_text(json.dumps(report, indent=2) + '\n')
 print(str(report['total'] - report['failed']) + '/' + str(report['total']) + ' checks passed')
 sys.exit(bool(report['failed']))

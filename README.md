@@ -44,6 +44,7 @@ of silently mixing builds. See `tools/demo.py` for the pinned URL and hash.
 and writes `build/luademo`. Each build is fresh; compiler/linker errors fail the
 command. `make run` launches the demo under GoldenGate with memory checking.
 `make clean` removes `build/`, retaining the verified SDK cache and transfer packages.
+Tests run in a disposable directory and leave your generated shop reports alone.
 Machine-specific settings belong in ignored `local.mk`.
 
 The normal run compares a two-week stock policy ($192 within a $200 budget)
@@ -63,8 +64,8 @@ Demo completed
 `config.lua` defines `scripts`, an array of at most eight nonempty paths of up to
 63 bytes each. Paths resolve from the launch directory. The default sequence runs
 `shopdemo.lua`, `coltest.lua`, and `stattest.lua`. The shop example reads `stock.csv`
-and loads `policy.lua`; the other two demonstrate the collection and status APIs. For direct GoldenGate
-commands, export `GOLDEN_GATE` in your shell as well as setting it in `local.mk`:
+and loads `policy.lua`; the other two demonstrate the collection and status APIs.
+For direct GoldenGate commands, export `GOLDEN_GATE` in your shell as well as setting it in `local.mk`:
 
 ```sh
 export GOLDEN_GATE=/absolute/path/to/orca-sdk-2.2.1
@@ -100,7 +101,9 @@ flow, configuration errors, Lua error recovery, callbacks, integer widths,
 bounds, explicit/automatic cleanup, and status string limits. Shop tests cover
 CSV import errors, callbacks, immutable snapshots, whole-pack orders, budget
 boundaries, exact report totals, and CSV quoting. Results and exact
-executable hashes are written to `build/TEST-REPORT.json` and `BUILD-MANIFEST.json`.
+executable hashes are written to `build/TEST-REPORT.json` and
+`build/BUILD-MANIFEST.json`. `make check` runs the SDK cache checks without the
+IIgs toolchain; the GitHub workflow runs these tooling checks only.
 
 With AppleCommander **acx** and CiderPress II **cp2** installed:
 
@@ -113,7 +116,8 @@ This rebuilds and tests before producing `dist/LUAGSDEMO.SHK` and
 read back and compared byte-for-byte, including ProDOS type/aux metadata.
 Use GS ShrinkIt or copy from the transfer image preserving file types. Run
 `luademo` from an ORCA-compatible shell in the extracted directory.
-See [IIgs installation](docs/INSTALL.txt) and [validation results](docs/VALIDATION.md).
+See [IIgs installation](docs/INSTALL.txt), [validation results](docs/VALIDATION.md),
+and the [release procedure](docs/RELEASING.md).
 
 The new host has been tested under GoldenGate. **Real IIgs acceptance is still
 required.** The old project's System16 launch claim has not been revalidated;
@@ -125,9 +129,9 @@ The obsolete bundled headers, library, VM object, and executable are removed.
 The former zero-based collection API is replaced by the methods shown above.
 The uninitialized configuration pointer, unchecked allocations, double-free,
 unbounded status copy, ignored script errors, and 16-bit C integer truncation
-are fixed. The old Lua-internal string-table dumper is removed. The standalone
-`poker.lua` remains as historical example source; it is not run or packaged by
-this embedding demo. Current game examples live in the Lua IIgs distribution.
+are fixed. The old Lua-internal string-table dumper, unused poker script, and
+obsolete screenshot are removed; their earlier versions remain in Git history.
+Current game examples live in the Lua IIgs distribution.
 
 ## Acknowledgments
 

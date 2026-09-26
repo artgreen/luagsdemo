@@ -7,8 +7,12 @@ installation is shared with lua-iigs, but no Lua source checkout is needed.
 
 ## Executable and package checks
 
+- `make check`: **5/5** offline SDK tooling checks passed. GitHub CI runs
+  these checks without GoldenGate or a compiler SDK.
+
 - `make package` rebuilt both IIgs hosts. **48/48** automated checks passed
-  under `iix --memcheck`.
+  under `iix --memcheck`. The suite now runs in a disposable directory;
+  existing reports in the checkout were unchanged.
 - Every member of both transfer containers matched its source bytes and
   expected ProDOS type/auxiliary type, with exactly the expected member set.
 - Extracted `LUAGSDEMO.SHK` into a separate directory and ran the default
@@ -36,7 +40,7 @@ Generated records are in `build/BUILD-MANIFEST.json` and
 `build/TEST-REPORT.json`, also copied into `dist/`. These include hashes for
 both C inputs and runtime Lua/data inputs. `dist/SHA256SUMS` covers the two
 transfer containers and both manifests. The installed-package run and policy
-edit are recorded in `build/shop-installed.log` and `build/shop-installed.json`.
+edit for the unchanged application executable are recorded in `build/shop-installed.log` and `build/shop-installed.json`.
 
 ## Real IIgs acceptance
 
